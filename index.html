@@ -1,0 +1,800 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>উচ্চতর গণিত অনলাইন কুইজ</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- html2pdf for downloading PDF solution sheet -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Hind Siliguri', sans-serif;
+            background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #0f172a 100%);
+            min-height: 100vh;
+            color: #f8fafc;
+        }
+        .glass-card {
+            background: rgba(30, 41, 59, 0.85);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4);
+        }
+        .custom-scroll::-webkit-scrollbar {
+            width: 8px;
+        }
+        .custom-scroll::-webkit-scrollbar-track {
+            background: rgba(15, 23, 42, 0.6);
+            border-radius: 8px;
+        }
+        .custom-scroll::-webkit-scrollbar-thumb {
+            background: #475569;
+            border-radius: 8px;
+        }
+        .custom-scroll::-webkit-scrollbar-thumb:hover {
+            background: #64748b;
+        }
+        .math-symbol {
+            font-family: 'Times New Roman', serif;
+            font-style: italic;
+        }
+        /* PDF and Print styling optimizations */
+        .pdf-option-correct {
+            background: rgba(16, 185, 129, 0.15) !important;
+            border-color: rgba(16, 185, 129, 0.5) !important;
+            color: #34d399 !important;
+        }
+        .pdf-option-wrong {
+            background: rgba(244, 63, 94, 0.15) !important;
+            border-color: rgba(244, 63, 94, 0.5) !important;
+            color: #fb7185 !important;
+        }
+    </style>
+</head>
+<body class="flex items-center justify-center p-3 md:p-6">
+
+    <div class="max-w-4xl w-full mx-auto">
+        
+        <!-- HEADER TITLE -->
+        <div class="text-center mb-6">
+            <h1 class="text-2xl md:text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 via-teal-300 to-cyan-400 mb-2">
+                উচ্চতর গণিত ১ম পত্র (অসমতা ও বাস্তব সংখ্যা)
+            </h1>
+            <p class="text-slate-400 text-sm md:text-base"> কুইজ মূল্যায়ন ও সমাধান[HM-03]</p>
+        </div>
+
+        <!-- LOGIN SCREEN -->
+        <div id="login-screen" class="glass-card rounded-2xl p-6 md:p-10 border border-white/10 max-w-md mx-auto shadow-2xl">
+            <div class="text-center mb-6">
+                <div class="w-16 h-16 bg-emerald-500/10 text-emerald-400 rounded-full flex items-center justify-center mx-auto mb-4 border border-emerald-500/20">
+                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l9-5-9-5-9 5 9 5z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0112 20.055a11.952 11.952 0 01-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z"/></svg>
+                </div>
+                <h2 class="text-xl font-bold text-white mb-1">পরীক্ষার্থী লগইন</h2>
+                <p class="text-xs text-slate-400">পরীক্ষায় অংশ নিতে তোমার নাম ও প্রাপ্ত গোপন রোল দাও</p>
+            </div>
+
+            <form onsubmit="event.preventDefault(); handleLogin();" class="space-y-4">
+                <div>
+                    <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-2">পরীক্ষার্থীর নাম</label>
+                    <input type="text" id="student-name" required placeholder="তোমার নাম লেখো" 
+                           class="w-full px-4 py-3 bg-slate-900/80 border border-slate-700 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500 transition-all">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-2">৫ অক্ষরের গোপন রোল (Roll Code)</label>
+                    <input type="text" id="student-roll" required maxlength="5" placeholder="" 
+                           class="w-full px-4 py-3 bg-slate-900/80 border border-slate-700 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500 uppercase tracking-widest text-center font-mono font-bold transition-all">
+                </div>
+
+                <div id="login-error" class="hidden text-rose-400 text-xs bg-rose-500/10 border border-rose-500/20 p-3 rounded-lg text-center"></div>
+
+                <button type="submit" id="btn-login" class="w-full py-3.5 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white font-bold rounded-xl shadow-lg active:scale-95 transition-all flex items-center justify-center gap-2">
+                    পরীক্ষা শুরু করো
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+                </button>
+            </form>
+        </div>
+
+        <!-- QUIZ MAIN SCREEN -->
+        <div id="quiz-screen" class="hidden glass-card rounded-2xl p-4 md:p-8 border border-white/10">
+            <!-- Top Header Status -->
+            <div class="flex flex-col sm:flex-row justify-between items-center pb-5 mb-6 border-b border-slate-700/60 gap-4">
+                <div>
+                    <h2 class="text-lg md:text-xl font-bold text-emerald-400" id="header-student-name">শিক্ষার্থী: -</h2>
+                    <p class="text-xs text-slate-400" id="header-student-roll">রোল: -</p>
+                </div>
+                <div class="bg-slate-900/80 border border-slate-700 px-5 py-2 rounded-xl flex items-center gap-3">
+                    <span class="text-xs text-slate-400 font-medium">অবশিষ্ট সময়:</span>
+                    <span id="timer" class="text-xl md:text-2xl font-black font-mono text-amber-400">৩০:০০</span>
+                </div>
+            </div>
+
+            <!-- Questions Container -->
+            <div id="questions-container" class="space-y-6 max-h-[60vh] overflow-y-auto pr-2 custom-scroll mb-6">
+                <!-- 30 Questions injected here -->
+            </div>
+
+            <!-- Bottom Action Footer -->
+            <div class="pt-4 border-t border-slate-700/60 flex flex-col sm:flex-row justify-between items-center gap-4">
+                <div class="text-slate-300 text-sm">
+                    মোট উত্তর করা হয়েছে: <span id="answered-count" class="font-bold text-emerald-400">০</span> / ৩০
+                </div>
+                <button onclick="confirmSubmit()" class="w-full sm:w-auto px-8 py-3.5 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white font-bold rounded-xl shadow-lg active:scale-95 transition-all flex items-center justify-center gap-2">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                    উত্তর জমা দিন
+                </button>
+            </div>
+        </div>
+
+        <!-- CUSTOM SUBMIT CONFIRMATION MODAL -->
+        <div id="confirm-modal" class="hidden fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 flex items-center justify-center p-4">
+            <div class="glass-card max-w-md w-full p-6 rounded-2xl border border-white/20 text-center shadow-2xl">
+                <div class="w-16 h-16 bg-amber-500/10 text-amber-400 rounded-full flex items-center justify-center mx-auto mb-4 border border-amber-500/20">
+                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+                </div>
+                <h3 class="text-xl font-bold text-white mb-2">পরীক্ষা জমা দিতে চাও?</h3>
+                <p id="modal-msg-text" class="text-slate-300 text-sm mb-6"></p>
+                <div class="flex gap-3 justify-center">
+                    <button onclick="closeConfirmModal()" class="px-5 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold rounded-xl transition-all">
+                        ফিরে যান
+                    </button>
+                    <button onclick="executeSubmit()" class="px-6 py-2.5 bg-emerald-500 hover:bg-emerald-600 text-white font-bold rounded-xl shadow-lg transition-all">
+                        হ্যাঁ, জমা দিন
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- RESULT SCREEN -->
+        <div id="result-screen" class="hidden glass-card rounded-2xl p-6 md:p-10 border border-white/10">
+            <div class="text-center mb-8">
+                <div class="w-20 h-20 bg-emerald-500/10 text-emerald-400 rounded-full flex items-center justify-center mx-auto mb-4 border border-emerald-500/20">
+                    <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                </div>
+                <h2 class="text-2xl md:text-3xl font-extrabold text-white mb-1">পরীক্ষার ফলাফল কার্ড</h2>
+                <p class="text-slate-400 text-sm" id="res-date">তারিখ: -</p>
+            </div>
+
+            <!-- Score Summary Cards -->
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+                <div class="bg-slate-900/80 border border-slate-700/80 p-4 rounded-xl text-center">
+                    <p class="text-xs text-slate-400 font-medium mb-1">পরীক্ষার্থী</p>
+                    <p class="text-base font-bold text-white truncate" id="res-name">-</p>
+                    <p class="text-xs text-emerald-400 font-mono" id="res-roll">-</p>
+                </div>
+                <div class="bg-slate-900/80 border border-slate-700/80 p-4 rounded-xl text-center">
+                    <p class="text-xs text-slate-400 font-medium mb-1">মোট নম্বর</p>
+                    <p class="text-2xl font-black text-amber-400"><span id="res-score">0</span> <span class="text-xs text-slate-400">/ ৩০</span></p>
+                </div>
+                <div class="bg-slate-900/80 border border-slate-700/80 p-4 rounded-xl text-center">
+                    <p class="text-xs text-slate-400 font-medium mb-1">সঠিক উত্তর</p>
+                    <p class="text-2xl font-black text-emerald-400" id="res-correct">0</p>
+                </div>
+                <div class="bg-slate-900/80 border border-slate-700/80 p-4 rounded-xl text-center">
+                    <p class="text-xs text-slate-400 font-medium mb-1">ভুল উত্তর</p>
+                    <p class="text-2xl font-black text-rose-400" id="res-wrong">0</p>
+                </div>
+            </div>
+
+            <!-- Action buttons -->
+            <div class="flex flex-col sm:flex-row justify-center gap-4 mb-8">
+                <button onclick="downloadSolutionPDF()" class="px-6 py-3 bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white font-bold rounded-xl shadow-lg active:scale-95 transition-all flex items-center justify-center gap-2">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                    সমাধান শিট (PDF) ডাউনলোড করো
+                </button>
+            </div>
+
+            <!-- Detailed Solutions PDF Section -->
+            <div id="pdf-container" class="glass-card rounded-2xl p-6 md:p-8 border border-white/10 shadow-2xl space-y-6">
+                <div class="text-center pb-6 border-b border-slate-700/80">
+                    <div class="inline-flex items-center gap-2 px-3 py-1 bg-emerald-500/10 text-emerald-400 rounded-full border border-emerald-500/20 text-xs font-bold mb-3">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                        অফিসিয়াল অ্যানসার কি ও সমাধান পত্র
+                    </div>
+                    <h3 class="text-2xl font-black text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 via-teal-300 to-cyan-400">উচ্চতর গণিত ১ম পত্র - পূর্ণাঙ্গ সমাধান</h3>
+                    <p class="text-xs text-slate-400 mt-1">উচ্চতর গণিত (অসমতা ও বাস্তব সংখ্যা) - মোট প্রশ্ন: ৩০টি</p>
+                </div>
+                <div id="solutions-list" class="space-y-6">
+                    <!-- Injected via JavaScript -->
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Firebase Configuration & Setup -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+
+        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {
+            apiKey: "demo-key",
+            authDomain: "demo.firebaseapp.com",
+            projectId: "demo-project",
+            storageBucket: "demo.appspot.com",
+            messagingSenderId: "123456",
+            appId: "1:123456:web:123456"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const auth = getAuth(app);
+
+        // Sign in auth
+        async function initAuth() {
+            try {
+                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                    await signInWithCustomToken(auth, __initial_auth_token);
+                } else {
+                    await signInAnonymously(auth);
+                }
+            } catch(e) {
+                console.log("Auth setup:", e);
+            }
+        }
+        initAuth();
+
+        window.firebaseDb = db;
+        window.doc = doc;
+        window.setDoc = setDoc;
+        window.getDoc = getDoc;
+        window.appId = typeof __app_id !== 'undefined' ? __app_id : 'math-quiz-app-v1';
+    </script>
+
+    <!-- Main App Logic -->
+    <script>
+        // Valid 5-character Roll Codes
+        const VALID_ROLLS = [
+            'A7B9K', 'M3P8X', 'R2W6N', 'T5L1Q', 'Z4D9V',
+            'H8K3Y', 'C6J2F', 'S9G4W', 'E1N7P', 'B5V8R'
+        ];
+
+        // 30 High School Math MCQs (Clean Bengali Format)
+        const questions = [
+            {
+                id: 1,
+                question: "|2x + 1| < 3 অসমতার সমাধান সেট কোনটি?",
+                options: ["-2 ≤ x ≤ 1", "-2 < x < 1", "-1 ≤ x ≤ 2", "-1 < x < 2"],
+                correct: 1,
+                explanation: "|2x + 1| < 3 ⇒ -3 < 2x + 1 < 3 ⇒ -4 < 2x < 2 ⇒ -2 < x < 1"
+            },
+            {
+                id: 2,
+                question: "|x - 3| < 2 কে পরমমান চিহ্ন ব্যতিত লিখলে কোনটি হয়?",
+                options: ["0 < x < 3", "-1 < x < 2", "1 < x < 5", "কোনটি নয়"],
+                correct: 2,
+                explanation: "|x - 3| < 2 ⇒ -2 < x - 3 < 2 ⇒ -2 + 3 < x < 2 + 3 ⇒ 1 < x < 5"
+            },
+            {
+                id: 3,
+                question: "-7 < x + 3 < 5 কে পরম মানের সাহায্যে প্রকাশ করঃ",
+                options: ["|x + 2| < 4", "|x + 4| < 6", "|x + 3| < 6", "|x + 1| < 3"],
+                correct: 1,
+                explanation: "সীমা দুটির গড় = (-7 + 5)/2 = -1। সম্পূর্ণ অসমতায় 1 যোগ করে: -7 + 1 < x + 3 + 1 < 5 + 1 ⇒ -6 < x + 4 < 6 ⇒ |x + 4| < 6"
+            },
+            {
+                id: 4,
+                question: "|3x - 1| ≤ 5 এর পরমমান চিহ্ন অপসারণ করলে কোনটি পাওয়া যাবে?",
+                options: ["-4/3 ≤ x ≤ 2", "-2 ≤ x ≤ 4/3", "1 ≤ x ≤ 5", "-5 ≤ x ≤ 5"],
+                correct: 0,
+                explanation: "|3x - 1| ≤ 5 ⇒ -5 ≤ 3x - 1 ≤ 5 ⇒ -4 ≤ 3x ≤ 6 ⇒ -4/3 ≤ x ≤ 2"
+            },
+            {
+                id: 5,
+                question: "1 / [x(x - 1)] < 0 এর সমাধান নিচের কোনটি?",
+                options: ["x < 0 অথবা x > 1", "0 < x < 1", "x > 0 অথবা x > 1", "x < 0 অথবা x < 1"],
+                correct: 1,
+                explanation: "1 / [x(x - 1)] < 0 হবে যখন হর x(x - 1) < 0 হয়। সুতরাং, 0 < x < 1।"
+            },
+            {
+                id: 6,
+                question: "একটি ধনাত্মক সংখ্যার সাথে 200 যোগ করলে সেটি পূর্ণবর্গ হয়, আবার 276 যোগ করলে অপর বর্গসংখ্যা হয়। সংখ্যাটি কত?",
+                options: ["114", "128", "124", "196"],
+                correct: 2,
+                explanation: "সংখ্যাটি 124 হলে: 124 + 200 = 324 = (18)² এবং 124 + 276 = 400 = (20)²।"
+            },
+            {
+                id: 7,
+                question: "তিনটি পর পর জোড় সংখ্যা a, b, c এর গড় a/3 এর চেয়ে ছোট হলে, নিচের কোনটি সত্য?",
+                options: ["a মৌলিক সংখ্যা", "a শূন্য", "a ঋণাত্মক সংখ্যা", "a ধনাত্মক সংখ্যা"],
+                correct: 2,
+                explanation: "গড় b = a + 2। শর্তমতে a + 2 < a/3 ⇒ 3a + 6 < a ⇒ 2a < -6 ⇒ a < -3। অর্থাৎ a একটি ঋণাত্মক সংখ্যা।"
+            },
+            {
+                id: 8,
+                question: "-2 ≤ x ≤ 5 অসমতাটির ব্যবধিরূপ কোনটি?",
+                options: ["(-2, 5)", "[-2, 5]", "(-2, 5]", "[-2, 5)"],
+                correct: 1,
+                explanation: "উভয় প্রান্তে সমান (≤) চিহ্ন থাকায় এটি থার্ড ব্র্যাকেট [-2, 5] ব্যবধি।"
+            },
+            {
+                id: 9,
+                question: "x এর মান ঋণাত্মক হলে 3 < |x| < 5 এর সমাধান কোনটি?",
+                options: ["5 < x < 3", "-3 < x < -5", "-5 < x < -3", "3 < x < 5"],
+                correct: 2,
+                explanation: "x ঋণাত্মক হলে |x| = -x। ফলে 3 < -x < 5 ⇒ -5 < x < -3।"
+            },
+            {
+                id: 10,
+                question: "|2x + 5| < 1 এর সমাধান সেট কোনটি?",
+                options: ["-3 < x < -2", "-2 < x < -3", "2 < x < 3", "x < -3 অথবা x > -2"],
+                correct: 0,
+                explanation: "|2x + 5| < 1 ⇒ -1 < 2x + 5 < 1 ⇒ -6 < 2x < -4 ⇒ -3 < x < -2"
+            },
+            {
+                id: 11,
+                question: "5x - x² - 6 > 0 হলে সমাধান কোনটি?",
+                options: ["x < 2", "2 > x > 3", "2 < x < 3", "x > 3, x < 2"],
+                correct: 2,
+                explanation: "x² - 5x + 6 < 0 ⇒ (x - 2)(x - 3) < 0 ⇒ 2 < x < 3"
+            },
+            {
+                id: 12,
+                question: "a < b হলে, নিচের কোনটি সঠিক?",
+                options: ["ac < bc (যখন c > 0)", "ac > bc (যখন c > 0)", "ab < bc (যখন c < 0)", "ac > bc (যখন c = 0)"],
+                correct: 0,
+                explanation: "ধনাত্মক সংখ্যা (c > 0) দিয়ে গুণ করলে অসমতার দিক অপরিবর্তিত থাকে।"
+            },
+            {
+                id: 13,
+                question: "a, b ∈ R হলে বাস্তব সংখ্যার ক্ষেত্রে কোনটি সত্য?",
+                options: ["|a - b| ≤ |a| + |b|", "|a - b| ≥ |a| + |b|", "|a - b| ≤ |a| - |b|", "|a - b| > |a| - |b|"],
+                correct: 0,
+                explanation: "পরমমানের ত্রিভুজ অসমতা অনুযায়ী |a - b| ≤ |a| + |b| সর্বদা সত্য।"
+            },
+            {
+                id: 14,
+                question: "-3 < x < -1 এর পরমমান প্রকাশ কোনটি?",
+                options: ["|x - 2| < 1", "|x + 2| < 1", "|x - 2| > 1", "|x + 2| > 1"],
+                correct: 1,
+                explanation: "গড় = (-3 - 1)/2 = -2। উভয়পক্ষে 2 যোগ করে: -1 < x + 2 < 1 ⇒ |x + 2| < 1"
+            },
+            {
+                id: 15,
+                question: "√(xy) = √x · √y সম্পর্কটি কোন শর্তে সত্য?",
+                options: ["x > 0, y < 0", "x < 0, y > 0", "x > 0, y > 0", "x < 0, y < 0"],
+                correct: 2,
+                explanation: "বাস্তব সংখ্যার জন্য উভয় x ও y ধনাত্মক (বা অঋণাত্মক) হতে হবে।"
+            },
+            {
+                id: 16,
+                question: "A = { n/(n+1) : n ∈ N } সেটটির ইনফিমাম এবং সুপ্রিমাম যথাক্রমে কত?",
+                options: ["0 ও ∞", "-∞ ও 3", "1/2 ও 1", "1/2 ও ∞"],
+                correct: 2,
+                explanation: "n = 1 বসালে সর্বনিম্ন মান 1/2 (ইনফিমাম) এবং n → ∞ হলে সর্বোচ্চ মান 1 এর দিকে যায় (সুপ্রিমাম)।"
+            },
+            {
+                id: 17,
+                question: "||3 - 5| - 7 - |9 - 11|| এর মান কত?",
+                options: ["-11", "-7", "7", "11"],
+                correct: 2,
+                explanation: "|3 - 5| = 2 এবং |9 - 11| = 2। সুতরাং |2 - 7 - 2| = |-7| = 7।"
+            },
+            {
+                id: 18,
+                question: "N, Z, Q, R, C সেটের অন্তর্ভুক্তির সঠিক ক্রম কোনটি?",
+                options: [
+                    "N ⊂ Z ⊂ Q' ⊂ R ⊂ C",
+                    "N ⊂ Z ⊂ Q ⊂ R ⊂ C",
+                    "N ⊂ Z ⊂ Q' ⊂ C ⊂ R",
+                    "N ⊂ Z ⊂ Q ⊂ C ⊂ R"
+                ],
+                correct: 1,
+                explanation: "স্বাভাবিক সংখ্যা ⊂ পূর্ণসংখ্যা ⊂ মূলদ সংখ্যা ⊂ বাস্তব সংখ্যা ⊂ জটিল সংখ্যা।"
+            },
+            {
+                id: 19,
+                question: "3x - 2 > 2x - 1 এর সমাধান সেট কোনটি?",
+                options: ["[1, ∞)", "(1, ∞)", "[3/2, ∞)", "(-∞, ∞)"],
+                correct: 1,
+                explanation: "3x - 2x > -1 + 2 ⇒ x > 1। যা ব্যবধি আকারে (1, ∞)।"
+            },
+            {
+                id: 20,
+                question: "S = { x ∈ N : 4 ≤ x² ≤ 81 } হলে sup S এর মান কত?",
+                options: ["2", "4", "9", "81"],
+                correct: 2,
+                explanation: "x² ≤ 81 ⇒ x ≤ 9। স্বাভাবিক সংখ্যা সেটে সর্বোচ্চ মান (sup S) = 9।"
+            },
+            {
+                id: 21,
+                question: "নিচের কোনটি অমূলদ সংখ্যা?",
+                options: ["√(-2)", "2 + √(-3)", "π", "√9"],
+                correct: 2,
+                explanation: "π একটি সুপরিচিত অমূলদ বাস্তব সংখ্যা। √9 = 3 (মূলদ) এবং কাল্পনিক সংখ্যা অমূলদ নয়।"
+            },
+            {
+                id: 22,
+                question: "y > 0 এবং 4x - 3y > 1 অসমতার সমাধান সেট কোন চতুর্ভাগে অবস্থান করে?",
+                options: ["১ম", "২য়", "৩য়", "৪র্থ"],
+                correct: 0,
+                explanation: "y > 0 হওয়ায় এটি ১ম অথবা ২য় চতুর্ভাগ। আবার 4x > 1 + 3y > 1 হওয়ায় x > 0। সুতরাং ১ম চতুর্ভাগ।"
+            },
+            {
+                id: 23,
+                question: "|3x + 2| < 7 এর সমাধান কোনটি?",
+                options: ["-3 < x < 5/3", "-3 < x < 7/3", "3 < x < 4", "-3 < x < 3"],
+                correct: 0,
+                explanation: "-7 < 3x + 2 < 7 ⇒ -9 < 3x < 5 ⇒ -3 < x < 5/3"
+            },
+            {
+                id: 24,
+                question: "-8 < 3x < 6 কে পরমমান চিহ্নে প্রকাশ করলে কোনটি হবে?",
+                options: ["|3x + 2| < 6", "|3x + 1| < 7", "|3x - 1| < 7", "|3x - 1| < 8"],
+                correct: 1,
+                explanation: "গড় = (-8 + 6)/2 = -1। উভয়পক্ষে 1 যোগ করে: -7 < 3x + 1 < 7 ⇒ |3x + 1| < 7"
+            },
+            {
+                id: 25,
+                question: "x + y ≤ 8, x + y ≥ 2, x ≥ 0, y ≥ 0 শর্তে 2x + y এর সর্বনিম্ন মান কত?",
+                options: ["0", "2", "4", "16"],
+                correct: 1,
+                explanation: "সর্বনিম্ন বিন্দু (0,2) বসালে 2(0) + 2 = 2 পাওয়া যায়।"
+            },
+            {
+                id: 26,
+                question: "|x - 2| < 5 পরমমান ব্যতীত লিখলে কোনটি হয়?",
+                options: ["-5 < x < 5", "-3 < x < 5", "-3 < x < 7", "-5 < x < 7"],
+                correct: 2,
+                explanation: "-5 < x - 2 < 5 ⇒ -5 + 2 < x < 5 + 2 ⇒ -3 < x < 7"
+            },
+            {
+                id: 27,
+                question: "নিচের কোনটি মূলদ সংখ্যা?",
+                options: ["1/√2", "√2 / √8", "π", "e"],
+                correct: 1,
+                explanation: "√2 / √8 = √2 / (2√2) = 1/2, যা একটি মূলদ সংখ্যা।"
+            },
+            {
+                id: 28,
+                question: "|4x - 3| < 5 এর সমাধান পরমমান চিহ্ন ব্যতীত প্রকাশ করলে কোনটি হবে?",
+                options: ["-1/2 < x < 2", "-2 < x < 1/2", "-1 < x < 2", "-1/2 < x < 5/2"],
+                correct: 0,
+                explanation: "-5 < 4x - 3 < 5 ⇒ -2 < 4x < 8 ⇒ -1/2 < x < 2"
+            },
+            {
+                id: 29,
+                question: "-1 < x < 7 কে পরমমান চিহ্নের সাহায্যে প্রকাশ করলে কোনটি হবে?",
+                options: ["|x - 3| < 4", "|x + 3| < 4", "|x - 4| < 3", "|x + 4| < 3"],
+                correct: 0,
+                explanation: "গড় = (-1 + 7)/2 = 3। ৩ বিয়োগ করে: -4 < x - 3 < 4 ⇒ |x - 3| < 4"
+            },
+            {
+                id: 30,
+                question: "S = { x ∈ R : 1 < x ≤ 5 } সেটটির ইনফিমাম (inf S) ও সুপ্রিমাম (sup S) যথাক্রমে কত?",
+                options: ["1 ও 5", "0 ও 5", "1 ও ∞", "-∞ ও 5"],
+                correct: 0,
+                explanation: "সেটের নিম্নসীমার সর্বোচ্চ মান (infimum) = 1 এবং ঊর্ধ্বসীমার সর্বনিম্ন মান (supremum) = 5।"
+            }
+        ];
+
+        let currentStudent = { name: '', roll: '' };
+        let userAnswers = {};
+        let examFinished = false;
+        let timerInterval = null;
+        let timeLeft = 1800; // 30 minutes in seconds
+
+        // Global functions for inline Event Handlers
+        window.handleLogin = async function() {
+            const nameInput = document.getElementById('student-name');
+            const rollInput = document.getElementById('student-roll');
+            const errorDiv = document.getElementById('login-error');
+            const btnLogin = document.getElementById('btn-login');
+
+            const name = nameInput.value.trim();
+            const roll = rollInput.value.trim().toUpperCase();
+
+            errorDiv.classList.add('hidden');
+
+            if (!name || !roll) {
+                errorDiv.innerText = "দয়া করে তোমার নাম ও রোল নম্বর সম্পূর্ণ প্রদান করো।";
+                errorDiv.classList.remove('hidden');
+                return;
+            }
+
+            if (!VALID_ROLLS.includes(roll)) {
+                errorDiv.innerText = "ভুল রোল নম্বর! সঠিক গোপন রোল নম্বর ব্যবহার করো।";
+                errorDiv.classList.remove('hidden');
+                return;
+            }
+
+            currentStudent = { name, roll };
+            btnLogin.innerHTML = `লগইন হচ্ছে...`;
+            btnLogin.disabled = true;
+
+            // Check Firebase Firestore if exam already given
+            try {
+                const db = window.firebaseDb;
+                const appId = window.appId;
+                if (db && window.doc && window.getDoc) {
+                    const docRef = window.doc(db, 'artifacts', appId, 'public', 'data', 'exam_results', roll);
+                    const docSnap = await window.getDoc(docRef);
+
+                    if (docSnap.exists()) {
+                        // Previous exam found! Directly show result screen
+                        const prevResult = docSnap.data();
+                        document.getElementById('login-screen').classList.add('hidden');
+                        document.getElementById('result-screen').classList.remove('hidden');
+                        showResultScreen(prevResult);
+                        return;
+                    }
+                }
+            } catch(err) {
+                console.log("Firestore fetch error:", err);
+            }
+
+            // If no previous exam, start fresh exam
+            startQuizScreen();
+        };
+
+        function startQuizScreen() {
+            document.getElementById('login-screen').classList.add('hidden');
+            document.getElementById('quiz-screen').classList.remove('hidden');
+
+            document.getElementById('header-student-name').innerText = `শিক্ষার্থী: ${currentStudent.name}`;
+            document.getElementById('header-student-roll').innerText = `রোল: ${currentStudent.roll}`;
+
+            renderQuestions();
+            startTimer();
+        }
+
+        function renderQuestions() {
+            const container = document.getElementById('questions-container');
+            container.innerHTML = '';
+
+            questions.forEach((q, qIdx) => {
+                const qCard = document.createElement('div');
+                qCard.className = 'bg-slate-900/90 border border-slate-700/80 rounded-xl p-4 md:p-6 space-y-4';
+                
+                let optionsHtml = '';
+                const bnOptionPrefix = ['(ক)', '(খ)', '(গ)', '(ঘ)'];
+
+                q.options.forEach((opt, oIdx) => {
+                    optionsHtml += `
+                        <label onclick="selectAnswer(${q.id}, ${oIdx})" 
+                               id="option-${q.id}-${oIdx}"
+                               class="flex items-center gap-3 p-3 rounded-lg border border-slate-800 bg-slate-950/60 hover:bg-slate-800/80 cursor-pointer transition-all">
+                            <input type="radio" name="q-${q.id}" value="${oIdx}" class="w-4 h-4 text-emerald-500 focus:ring-0">
+                            <span class="text-sm font-semibold text-emerald-400">${bnOptionPrefix[oIdx]}</span>
+                            <span class="text-sm text-slate-200">${opt}</span>
+                        </label>
+                    `;
+                });
+
+                qCard.innerHTML = `
+                    <div class="flex items-start gap-3">
+                        <span class="bg-emerald-500/20 text-emerald-400 font-bold px-2.5 py-1 rounded-lg text-sm border border-emerald-500/30">
+                            ${toBengaliNumeral(qIdx + 1)}
+                        </span>
+                        <p class="text-base font-semibold text-white pt-0.5">${q.question}</p>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-2 pt-2">
+                        ${optionsHtml}
+                    </div>
+                `;
+
+                container.appendChild(qCard);
+            });
+        }
+
+        window.selectAnswer = function(qId, optionIdx) {
+            if (examFinished) return;
+            userAnswers[qId] = optionIdx;
+
+            // Highlight visual option selection
+            const q = questions.find(item => item.id === qId);
+            q.options.forEach((_, idx) => {
+                const el = document.getElementById(`option-${qId}-${idx}`);
+                if (el) {
+                    if (idx === optionIdx) {
+                        el.className = 'flex items-center gap-3 p-3 rounded-lg border border-emerald-500 bg-emerald-500/10 text-white cursor-pointer transition-all';
+                    } else {
+                        el.className = 'flex items-center gap-3 p-3 rounded-lg border border-slate-800 bg-slate-950/60 hover:bg-slate-800/80 cursor-pointer transition-all';
+                    }
+                }
+            });
+
+            // Update answered counter
+            document.getElementById('answered-count').innerText = toBengaliNumeral(Object.keys(userAnswers).length);
+        };
+
+        function startTimer() {
+            updateTimerDisplay();
+            timerInterval = setInterval(() => {
+                timeLeft--;
+                updateTimerDisplay();
+                if (timeLeft <= 0) {
+                    clearInterval(timerInterval);
+                    executeSubmit();
+                }
+            }, 1000);
+        }
+
+        function updateTimerDisplay() {
+            const m = Math.floor(timeLeft / 60);
+            const s = timeLeft % 60;
+            const mStr = m < 10 ? '0' + m : m;
+            const sStr = s < 10 ? '0' + s : s;
+            document.getElementById('timer').innerText = `${toBengaliNumeral(mStr)}:${toBengaliNumeral(sStr)}`;
+        }
+
+        window.confirmSubmit = function() {
+            const answeredCount = Object.keys(userAnswers).length;
+            const modalMsg = document.getElementById('modal-msg-text');
+            const modal = document.getElementById('confirm-modal');
+            
+            if (answeredCount < questions.length) {
+                modalMsg.innerText = `তুমি ৩০টির মধ্যে ${toBengaliNumeral(answeredCount)}টি প্রশ্নের উত্তর দিয়েছ। কিছু প্রশ্ন এখনও বাকি রয়েছে। নিশ্চিতভাবেই পরীক্ষা জমা দিতে চাও?`;
+            } else {
+                modalMsg.innerText = `তুমি সবগুলো (৩০টি) প্রশ্নের উত্তর সফলভাবে সম্পন্ন করেছ। এখন পরীক্ষা জমা দিতে চাও?`;
+            }
+            modal.classList.remove('hidden');
+        };
+
+        window.closeConfirmModal = function() {
+            document.getElementById('confirm-modal').classList.add('hidden');
+        };
+
+        window.executeSubmit = function() {
+            closeConfirmModal();
+            submitExam();
+        };
+
+        async function submitExam() {
+            if (examFinished) return;
+            examFinished = true;
+            if (timerInterval) clearInterval(timerInterval);
+
+            let correct = 0;
+            let wrong = 0;
+
+            questions.forEach(q => {
+                if (userAnswers[q.id] !== undefined) {
+                    if (userAnswers[q.id] === q.correct) {
+                        correct++;
+                    } else {
+                        wrong++;
+                    }
+                }
+            });
+
+            const examResult = {
+                studentName: currentStudent.name || 'শিক্ষার্থী',
+                studentRoll: currentStudent.roll || 'N/A',
+                score: correct,
+                total: questions.length,
+                correct: correct,
+                wrong: wrong,
+                answers: userAnswers,
+                submittedAt: new Date().toLocaleDateString('bn-BD', { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' })
+            };
+
+            // Hide quiz screen and show result screen
+            document.getElementById('quiz-screen').classList.add('hidden');
+            document.getElementById('result-screen').classList.remove('hidden');
+            showResultScreen(examResult);
+
+            // Permanently save to Firestore Database
+            try {
+                const db = window.firebaseDb;
+                const appId = window.appId;
+                if (db && window.doc && window.setDoc && currentStudent.roll) {
+                    const docRef = window.doc(db, 'artifacts', appId, 'public', 'data', 'exam_results', currentStudent.roll);
+                    await window.setDoc(docRef, examResult);
+                }
+            } catch (err) {
+                console.error("Save error:", err);
+            }
+        }
+
+        function showResultScreen(res) {
+            document.getElementById('res-name').innerText = res.studentName;
+            document.getElementById('res-roll').innerText = `রোল: ${res.studentRoll}`;
+            document.getElementById('res-score').innerText = toBengaliNumeral(res.score);
+            document.getElementById('res-correct').innerText = toBengaliNumeral(res.correct);
+            document.getElementById('res-wrong').innerText = toBengaliNumeral(res.wrong);
+            document.getElementById('res-date').innerText = `জমা প্রদানের সময়: ${res.submittedAt || 'সম্প্রতি'}`;
+
+            // Render Solutions Sheet with Enhanced Attractive Exam Layout
+            const solList = document.getElementById('solutions-list');
+            solList.innerHTML = '';
+
+            const bnOptionPrefix = ['(ক)', '(খ)', '(গ)', '(ঘ)'];
+
+            questions.forEach((q, idx) => {
+                const userAns = res.answers ? res.answers[q.id] : undefined;
+                const isCorrect = userAns === q.correct;
+                const isNotAnswered = userAns === undefined;
+
+                let statusBadge = '';
+                if (isNotAnswered) {
+                    statusBadge = `<span class="bg-slate-800 text-slate-400 border border-slate-700 text-xs px-3 py-1 rounded-full font-semibold flex items-center gap-1.5">
+                        <span class="w-2 h-2 rounded-full bg-slate-500"></span> উত্তর করা হয়নি
+                    </span>`;
+                } else if (isCorrect) {
+                    statusBadge = `<span class="bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 text-xs px-3 py-1 rounded-full font-bold flex items-center gap-1.5 shadow-sm">
+                        <span class="w-2 h-2 rounded-full bg-emerald-400"></span> সঠিক উত্তর (+১)
+                    </span>`;
+                } else {
+                    statusBadge = `<span class="bg-rose-500/20 text-rose-400 border border-rose-500/40 text-xs px-3 py-1 rounded-full font-bold flex items-center gap-1.5 shadow-sm">
+                        <span class="w-2 h-2 rounded-full bg-rose-400"></span> ভুল উত্তর (০)
+                    </span>`;
+                }
+
+                const solCard = document.createElement('div');
+                solCard.className = 'bg-slate-900/90 border border-slate-700/80 rounded-2xl p-5 md:p-6 space-y-4 shadow-xl transition-all';
+
+                let optionsGridHtml = '';
+                q.options.forEach((opt, oIdx) => {
+                    let cardStyle = 'border-slate-800 bg-slate-950/60 text-slate-300';
+                    let badge = '';
+
+                    if (oIdx === q.correct) {
+                        cardStyle = 'pdf-option-correct border-emerald-500/50 bg-emerald-500/10 text-emerald-300 font-semibold shadow-md';
+                        badge = `<span class="ml-auto text-xs bg-emerald-500/30 text-emerald-300 border border-emerald-400/30 px-2 py-0.5 rounded font-bold">সঠিক উত্তর</span>`;
+                    }
+                    if (userAns === oIdx && userAns !== q.correct) {
+                        cardStyle = 'pdf-option-wrong border-rose-500/50 bg-rose-500/10 text-rose-300 font-semibold shadow-md';
+                        badge = `<span class="ml-auto text-xs bg-rose-500/30 text-rose-300 border border-rose-400/30 px-2 py-0.5 rounded font-bold">তোমার উত্তর</span>`;
+                    }
+
+                    optionsGridHtml += `
+                        <div class="flex items-center gap-3 p-3 rounded-xl border ${cardStyle}">
+                            <span class="text-sm font-bold text-emerald-400 bg-slate-900/80 px-2 py-0.5 rounded border border-slate-700">${bnOptionPrefix[oIdx]}</span>
+                            <span class="text-sm">${opt}</span>
+                            ${badge}
+                        </div>
+                    `;
+                });
+
+                solCard.innerHTML = `
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-800">
+                        <div class="flex items-center gap-3">
+                            <span class="bg-gradient-to-r from-emerald-500 to-teal-600 text-white font-extrabold px-3 py-1 rounded-xl text-sm shadow-md">
+                                প্রশ্ন ${toBengaliNumeral(idx + 1)}
+                            </span>
+                            <h4 class="text-base md:text-lg font-bold text-white">${q.question}</h4>
+                        </div>
+                        <div>${statusBadge}</div>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-3 pt-1">
+                        ${optionsGridHtml}
+                    </div>
+
+                    <div class="bg-slate-950/80 border border-slate-800 rounded-xl p-4 mt-3">
+                        <div class="flex items-center gap-2 text-emerald-400 font-bold text-xs uppercase tracking-wider mb-1.5">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                            ব্যাখ্যা ও সমাধান:
+                        </div>
+                        <p class="text-sm text-slate-300 leading-relaxed font-medium pl-6">${q.explanation}</p>
+                    </div>
+                `;
+
+                solList.appendChild(solCard);
+            });
+        }
+
+        window.downloadSolutionPDF = function() {
+            const element = document.getElementById('pdf-container');
+            const opt = {
+                margin:       0.3,
+                filename:     `Higher_Math_Quiz_Solution_${currentStudent.roll || 'Student'}.pdf`,
+                image:        { type: 'jpeg', quality: 0.98 },
+                html2canvas:  { scale: 2, useCORS: true, logging: false },
+                jsPDF:        { unit: 'in', format: 'a4', orientation: 'portrait' }
+            };
+
+            html2pdf().set(opt).from(element).save();
+        };
+
+        function toBengaliNumeral(num) {
+            const bnDigits = ['০', '১', '২', '৩', '৪', '৫', '৬', '৭', '৮', '৯'];
+            return num.toString().replace(/\d/g, d => bnDigits[d]);
+        }
+    </script>
+</body>
+</html>
